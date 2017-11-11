@@ -1,2 +1,3 @@
 # users-service
-Users Service
+
+See `bark` repository for instructions.
