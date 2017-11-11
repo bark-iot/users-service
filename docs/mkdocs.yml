@@ -1,0 +1,4 @@
+site_name: Users Service
+theme: readthedocs
+site_dir: ../public/users/docs
+repo_url: https://github.com/bark-iot/users-service/
