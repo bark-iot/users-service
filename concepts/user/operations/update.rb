@@ -2,26 +2,29 @@ require 'securerandom'
 require 'bcrypt'
 
 class User < Sequel::Model(DB)
-  class Create < Trailblazer::Operation
+  class Update < Trailblazer::Operation
     extend Contract::DSL
 
-    step Model(User, :new)
+    step :model!
     step Contract::Build()
     step :hash_password
     step Contract::Validate()
     step :set_timestamps
-    step :generate_token
     step Contract::Persist()
 
     contract do
+      property :token, virtual: true
       property :username
-      property :email
       property :password
 
       validation do
-        required(:email).filled
-        required(:password).filled
+        required(:token).filled
       end
+    end
+
+    def model!(options, params:, **)
+      options['model'] = User.where(token: params[:token]).first
+      options['model']
     end
 
     def hash_password(options, params:, **)
@@ -31,12 +34,7 @@ class User < Sequel::Model(DB)
 
     def set_timestamps(options, model:, **)
       timestamp = Time.now
-      model.created_at = timestamp
       model.updated_at = timestamp
-    end
-
-    def generate_token(options, model:, **)
-      model.token = SecureRandom.uuid
     end
   end
 end
