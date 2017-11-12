@@ -12,7 +12,7 @@ EXPOSE 80
 
 # Bundle
 COPY Gemfile /app/Gemfile
-#COPY Gemfile.lock /app/Gemfile.lock
+COPY Gemfile.lock /app/Gemfile.lock
 RUN gem update bundler && bundle install --jobs 4
 
 # Copy the rest of source
