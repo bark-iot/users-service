@@ -7,8 +7,8 @@ class User < Sequel::Model(DB)
 
     step Model(User, :new)
     step Contract::Build()
-    step :hash_password
     step Contract::Validate()
+    step :hash_password
     step :set_timestamps
     step :generate_token
     step Contract::Persist()
@@ -19,14 +19,34 @@ class User < Sequel::Model(DB)
       property :password
 
       validation do
+        configure do
+          config.messages_file = 'config/error_messages.yml'
+
+          def email?(value)
+            ! /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i.match(value).nil?
+          end
+
+          def unique_email?(value)
+            User.where(email: value).first.nil?
+          end
+        end
+
         required(:email).filled
+        rule(email: [:email]) do |email|
+          email.filled?.then(email.email?)
+        end
+        rule(email: [:email]) do |email|
+          email.filled?.then(email.unique_email?)
+        end
         required(:password).filled
-        #TODO: password length validation, email format validation, unique email validation
+        rule(password: [:password]) do |password|
+          password.filled?.then(password.min_size?(8))
+        end
       end
     end
 
     def hash_password(options, params:, **)
-      params[:password] = BCrypt::Password.create(params[:password]) if params[:password]
+      options['contract.default'].password = BCrypt::Password.create(params[:password]) if params[:password]
       true
     end
 

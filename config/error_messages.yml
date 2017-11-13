@@ -1,0 +1,5 @@
+en:
+  errors:
+    valid_login_password?: "login not found or wrong password"
+    email?: "wrong format"
+    unique_email?: "already taken"

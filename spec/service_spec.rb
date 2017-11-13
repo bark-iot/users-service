@@ -6,7 +6,7 @@ describe 'Users Service' do
   end
 
   it 'should create user' do
-    post '/users', {username: 'Bob', email: 'bob@test.com', password: '123456'}
+    post '/users', {username: 'Bob', email: 'bob@test.com', password: '12345678'}
     expect(last_response).to be_ok
     body = JSON.parse(last_response.body)
     expect(body['email'] == 'bob@test.com').to be_truthy
@@ -22,8 +22,28 @@ describe 'Users Service' do
     expect(body[1] == ['password', ['must be filled']]).to be_truthy
   end
 
+  it 'should not create user without password less than 8 chars' do
+    post '/users', {username: 'Bob', email: 'bob@test.com', password: '123456'}
+    expect(last_response.status).to equal(422)
+    body = JSON.parse(last_response.body)
+    expect(body[0] == ['password', ['size cannot be less than 8']]).to be_truthy
+  end
+
+  it 'should not create user with wrong email' do
+    post '/users', {username: 'Bob', email: 'bobtest.com', password: '12345678'}
+    expect(last_response.status).to equal(422)
+    body = JSON.parse(last_response.body)
+    expect(body[0] == ['email', ['wrong format']]).to be_truthy
+  end
+
+  it 'should not create user with not unique email' do
+    post '/users', {username: 'Bob', email: user.email, password: '12345678'}
+    expect(last_response.status).to equal(422)
+    body = JSON.parse(last_response.body)
+    expect(body[0] == ['email', ['already taken']]).to be_truthy
+  end
+
   it 'should allow user to update his profile' do
-    user = User::Create.(email: 'bob@test.com', password: '123456')['model']
     header 'Authorization', "Bearer #{user.token}"
     post '/users/update', username: 'Bob'
     expect(last_response).to be_ok
@@ -37,7 +57,6 @@ describe 'Users Service' do
   end
 
   it 'should not allow user to update email' do
-    user = User::Create.(email: 'bob@test.com', password: '123456')['model']
     header 'Authorization', "Bearer #{user.token}"
     post '/users/update', username: 'Bob', email: 'bob2@test.com'
     expect(last_response).to be_ok
@@ -53,7 +72,6 @@ describe 'Users Service' do
   end
 
   it 'should find user by token' do
-    user = User::Create.(email: 'bob@test.com', password: '123456')['model']
     header 'Authorization', "Bearer #{user.token}"
     get '/users/by_token'
 
@@ -66,5 +84,9 @@ describe 'Users Service' do
     header 'Authorization', 'Bearer some-test-token'
     get '/users/by_token'
     expect(last_response.status).to equal(404)
+  end
+
+  def user
+    User::Create.(email: 'bob@test.com', password: '12345678')['model']
   end
 end
