@@ -42,6 +42,20 @@ get '/users/by_token' do
   if result.success?
     body User::Representer.new(result['model']).to_json
   else
+    if result['contract.default'].errors.messages.size > 0
+      status 422
+      body result['contract.default'].errors.messages.uniq.to_json
+    else
+      status 404
+    end
+  end
+end
+
+post '/users/by_email_password' do
+  result = User::FindByEmailPassword.(params)
+  if result.success?
+    body User::Representer.new(result['model']).to_json
+  else
     status 404
   end
 end

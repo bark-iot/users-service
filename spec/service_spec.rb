@@ -86,6 +86,19 @@ describe 'Users Service' do
     expect(last_response.status).to equal(404)
   end
 
+  it 'should find user by email and password' do
+    post '/users/by_email_password', {email: user.email, password: '12345678'}
+
+    expect(last_response).to be_ok
+    body = JSON.parse(last_response.body)
+    expect(body['email'] == 'bob@test.com').to be_truthy
+  end
+
+  it 'should return 404 if user with wrong password is not found' do
+    post '/users/by_email_password', {email: user.email, password: '123456789'}
+    expect(last_response.status).to equal(404)
+  end
+
   def user
     User::Create.(email: 'bob@test.com', password: '12345678')['model']
   end

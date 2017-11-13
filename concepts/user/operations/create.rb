@@ -38,6 +38,7 @@ class User < Sequel::Model(DB)
         rule(email: [:email]) do |email|
           email.filled?.then(email.unique_email?)
         end
+
         required(:password).filled
         rule(password: [:password]) do |password|
           password.filled?.then(password.min_size?(8))
