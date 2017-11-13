@@ -21,6 +21,7 @@ class User < Sequel::Model(DB)
       validation do
         required(:email).filled
         required(:password).filled
+        #TODO: password length validation, email format validation, unique email validation
       end
     end
 
