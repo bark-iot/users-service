@@ -11,6 +11,8 @@ class User < Sequel::Model(DB)
     step Contract::Validate()
     step :set_timestamps
     step Contract::Persist()
+    step :log_success
+    failure  :log_failure
 
     contract do
       property :token, virtual: true
@@ -35,6 +37,14 @@ class User < Sequel::Model(DB)
     def set_timestamps(options, model:, **)
       timestamp = Time.now
       model.updated_at = timestamp
+    end
+
+    def log_success(options, params:, model:, **)
+      LOGGER.info "[#{self.class}] Updated user with params #{params.to_json}. User: #{User::Representer.new(model).to_json}"
+    end
+
+    def log_failure(options, params:, **)
+      LOGGER.info "[#{self.class}] Failed to update user with params #{params.to_json}"
     end
   end
 end

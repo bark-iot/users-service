@@ -12,6 +12,8 @@ class User < Sequel::Model(DB)
     step :set_timestamps
     step :generate_token
     step Contract::Persist()
+    step :log_success
+    failure  :log_failure
 
     contract do
       property :username
@@ -59,6 +61,14 @@ class User < Sequel::Model(DB)
 
     def generate_token(options, model:, **)
       model.token = SecureRandom.uuid
+    end
+
+    def log_success(options, params:, model:, **)
+      LOGGER.info "[#{self.class}] Created user with params #{params.to_json}. User: #{User::Representer.new(model).to_json}"
+    end
+
+    def log_failure(options, params:, **)
+      LOGGER.info "[#{self.class}] Failed to create user with params #{params.to_json}"
     end
   end
 end

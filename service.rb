@@ -1,7 +1,7 @@
 require 'sinatra'
 require './config/database.rb'
 require './config/concepts.rb'
-require './config/debug.rb'
+require './config/logging.rb'
 
 
 set :bind, '0.0.0.0'
