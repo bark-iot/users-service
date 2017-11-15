@@ -22,5 +22,5 @@ configure :test do
       user: ENV['POSTGRES_USER'],
       password: ENV['POSTGRES_PASSWORD']
   )
-  Sequel::Migrator.run(DB, File.join(File.dirname(__FILE__), '../migrations'))
+  Sequel::Migrator.run(DB, File.join(File.dirname(__FILE__), '../migrations'), allow_missing_migration_files: true)
 end
