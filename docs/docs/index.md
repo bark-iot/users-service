@@ -42,7 +42,7 @@ POST `/users/update`
 
 *Authorization*
 
-To update user you need to send his token via `HTTP_AUTHORIZATION` header. Example:
+To update user you need to send his token via `Authorization` header. Example:
 `Authorization: Bearer <token>`.
 
 *POST parameters*
