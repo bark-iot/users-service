@@ -4,6 +4,7 @@ require 'roar/json'
 class User < Sequel::Model(DB)
   class Representer < Roar::Decorator
       include Roar::JSON
+      defaults render_nil: true
 
       property :id
       property :username
