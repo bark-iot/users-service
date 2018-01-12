@@ -2,6 +2,7 @@ require 'rack/test'
 require 'rspec'
 require 'pry'
 
+$VERBOSE = nil
 ENV['RACK_ENV'] = 'test'
 
 require File.expand_path '../../service.rb', __FILE__
